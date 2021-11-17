@@ -133,17 +133,11 @@ namespace game
         return &cellNone;
     }
 
-    
-
-    CellType* setWorldCell(World* world, uint32_t x, uint32_t y)
+    void setWorldCell(World* world, uint32_t x, uint32_t y)
     {
         if(world->grid[x][y].type == &cellNone){
             world->grid[x][y].type = world->lastPlaced;
-            CellType* winner = checkWin(world, x, y);
-            swapCells(world);
-            return winner;
         }
-        return &cellNone;
     }
 
     void cleanMap(World* world)
@@ -159,6 +153,17 @@ namespace game
         ss << "The last winner is: " << ((winner == &cellNought)? "NOUGHT" : "CROSS") << "!";
         window->setTitle(ss.str());
     }
+
+    bool isFilled(World* world)
+    {
+        for(uint32_t i = 0; i < width; i++)
+            for(uint32_t j = 0; j < height; j++)
+                if(world->grid[i][j].type == &cellNone)
+                    return false;
+        return true;
+
+    }
+
 }
 
 int main()
@@ -182,13 +187,19 @@ int main()
                 sf::Vector2i mPos = sf::Mouse::getPosition(window);
                 sf::Vector2f worldIndex = sf::Vector2f(((float)mPos.x / (float)window.getSize().x) * game::width, 
                                                        ((float)mPos.y / (float)window.getSize().y) * game::height);
-                game::CellType* winner = setWorldCell(&world, worldIndex.x, worldIndex.y);
+                setWorldCell(&world, worldIndex.x, worldIndex.y);
+                game::CellType* winner = game::checkWin(&world, worldIndex.x, worldIndex.y);
+                game::swapCells(&world);
                 if(winner != &game::cellNone){
                     game::setWinner(winner, &window);
                     game::cleanMap(&world);
                 }
+
+                if(game::isFilled(&world))
+                {
+                    game::cleanMap(&world);
+                }
             }
-            
         }
 
         window.clear(sf::Color::White);
