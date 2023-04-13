@@ -1,8 +1,9 @@
 #include "SFML/Graphics.hpp"
 #include <sstream>
+#include <iostream>
 namespace game
 {
-    const uint8_t width = 3, height = 3;
+    uint32_t width = 3, height = 3;
     const uint8_t outlineThickness = 2;
     struct CellType
     {
@@ -25,8 +26,10 @@ namespace game
         Cell** grid;
     };
 
-    World createWorld()
+    World createWorld(uint8_t w, uint8_t h)
     {
+	game::width = w;
+	game::height = h;
         World world;
         world.grid = new Cell*[width];
         for(uint32_t i = 0; i < width; i++)
@@ -168,11 +171,15 @@ namespace game
 
 int main()
 {
+    uint32_t dim = 3;
+    std::cout << "Enter world size (Default 3):\n";
+    std::cin >> dim;
+
     sf::RenderWindow window(sf::VideoMode(512, 512), "Tic Tac Toe", sf::Style::Default);
     window.setFramerateLimit(30);
     sf::Event ev;
 
-    game::World world = game::createWorld();
+    game::World world = game::createWorld(dim, dim);
     game::initTextures("res/textures/nought.png", "res/textures/cross.png");
 
     while(window.isOpen())
